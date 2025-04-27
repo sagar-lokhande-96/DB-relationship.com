@@ -20,19 +20,40 @@ const orderSchema  = new mongoose.Schema({
 
 const Order = mongoose.model("Order", orderSchema);
 
-const addData = async () => {
-    const order1 = new Order({
-        item: "Laptop",
-        price: 15000
-    });
-    const order2 = new Order({
-        item: "Mobile",
-        price: 25000
-    });
+
+//customer Schema
+const customerSchema = new mongoose.Schema({
+    name: String,
+    orders: [
+        { 
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Order"
+        }
+    ]
+})
+const Customer = mongoose.model("Customer", customerSchema);
+
+const adduser = async() =>{
     
-    await order1.save();
-    await order2.save();
-    
+    let user = new Customer({
+        name:"Sagar Lokhande",
+    });
+
+    let order1 = await Order.findOne({item:"Laptop"});
+    let order2 = await Order.findOne({item:"Mobile"});
+
+    user.orders.push(order1);
+    user.orders.push(order2);
+    let result = await user.save();
+    console.log(result);
 }
 
-addData();
+//adduser();
+
+
+//finding customer  ||  Check operation status
+const getData = async()=>{
+    let cust1 = await Customer.find().populate("orders");
+    console.log(cust1[0]);
+}
+getData();
